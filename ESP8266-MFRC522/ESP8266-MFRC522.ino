@@ -7,22 +7,22 @@ Many thanks to nikxha from the ESP8266 forum
 #include "MFRC522.h"
 
 /* wiring the MFRC522 to ESP8266 (ESP-12)
-RST     = GPIO5
-SDA(SS) = GPIO4 
-MOSI    = GPIO13
-MISO    = GPIO12
-SCK     = GPIO14
+RST     = D5
+SDA(SS) = D4 
+MOSI    = D13
+MISO    = D12
+SCK     = D14
 GND     = GND
 3.3V    = 3.3V
 */
 
-#define RST_PIN	5  // RST-PIN für RC522 - RFID - SPI - Modul GPIO5 
-#define SS_PIN	4  // SDA-PIN für RC522 - RFID - SPI - Modul GPIO4 
+#define RST_PIN	5  // RST-PIN für RC522 - RFID - SPI - Modul D5 
+#define SS_PIN	4  // SDA-PIN für RC522 - RFID - SPI - Modul D4 
 
 
-#define gpio2 4
-#define gpio4 2
-#define gpio3 0
+#define D4 2
+#define D3 0
+#define D8 15
 
 
 
@@ -33,7 +33,9 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);	// Create MFRC522 instance
 
 void setup() {
 
-  pinMode(gpio0, OUTPUT);
+  pinMode(D3, OUTPUT);
+  pinMode(D4, OUTPUT);
+  pinMode(D8, OUTPUT);
 
   
   Serial.begin(9600);    // Initialize serial communications
@@ -62,30 +64,51 @@ void setup() {
 
 void loop() { 
 
- digitalWrite(gpio0, HIGH);
- delay(1000);
-  digitalWrite(gpio0, LOW);
-  delay(1000);
-  // Look for new cards
-  if ( ! mfrc522.PICC_IsNewCardPresent()) {
-    delay(50);
+  // Busca nuevas tarjetas
+  if ( ! mfrc522.PICC_IsNewCardPresent()) 
+  {
     return;
   }
-  // Select one of the cards
-  if ( ! mfrc522.PICC_ReadCardSerial()) {
-    delay(50);
+  // Selecciona una de las tarjetas
+  if ( ! mfrc522.PICC_ReadCardSerial()) 
+  {
     return;
   }
-  // Show some details of the PICC (that is: the tag/card)
-  Serial.print(F("Card UID:"));
-  dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+  //Muestra el UID en el monitor serial.
+  Serial.print("UID tag :");
+  String content= "";
+  byte letter;
+  for (byte i = 0; i < mfrc522.uid.size; i++) 
+  {
+     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print(mfrc522.uid.uidByte[i], HEX);
+     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+     content.concat(String(mfrc522.uid.uidByte[i], HEX));
+  }
   Serial.println();
+  Serial.print("Message : ");
+  content.toUpperCase();
+  if (content.substring(1) == "36 BA 1B 7E" || content.substring(1) == "63 AF 36 6A" ) //Aqui van los UIDs autorizados
+  {
+    Serial.println("Acceso autorizado");
+    Serial.println();
+        
+        digitalWrite(D8, HIGH); 
+        digitalWrite(D4, HIGH);       
+        delay(2000);
+        digitalWrite(D4, LOW); 
+        digitalWrite(D8, LOW);
+  }
+ 
+ else   {
+    Serial.println(" Acceso negado"); 
+    for(int i=0; i<4;i++){
+        digitalWrite(D3, HIGH);       
+        delay(100);
+        digitalWrite(D3, LOW); 
+        delay(100);
+    }
+  }
 }
 
-// Helper routine to dump a byte array as hex values to Serial
-void dump_byte_array(byte *buffer, byte bufferSize) {
-  for (byte i = 0; i < bufferSize; i++) {
-    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-    Serial.print(buffer[i], HEX);
-  }
-}
+
