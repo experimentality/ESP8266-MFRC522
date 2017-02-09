@@ -8,7 +8,7 @@ Many thanks to nikxha from the ESP8266 forum
 
 /* wiring the MFRC522 to ESP8266 (ESP-12)
 RST     = D5
-SDA(SS) = D4 
+SDA(SS) = LedAzulD4 
 MOSI    = D13
 MISO    = D12
 SCK     = D14
@@ -17,12 +17,12 @@ GND     = GND
 */
 
 #define RST_PIN	5  // RST-PIN für RC522 - RFID - SPI - Modul D5 
-#define SS_PIN	4  // SDA-PIN für RC522 - RFID - SPI - Modul D4 
+#define SS_PIN	4  // SDA-PIN für RC522 - RFID - SPI - Modul LedAzulD4 
 
 
-#define D4 2
-#define D3 0
-#define D8 15
+#define LedAzulD4 2
+#define LedRojoD3 0
+#define RelayD8 15
 
 
 
@@ -33,9 +33,9 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);	// Create MFRC522 instance
 
 void setup() {
 
-  pinMode(D3, OUTPUT);
-  pinMode(D4, OUTPUT);
-  pinMode(D8, OUTPUT);
+  pinMode(LedRojoD3, OUTPUT);
+  pinMode(LedAzulD4, OUTPUT);
+  pinMode(RelayD8, OUTPUT);
 
   
   Serial.begin(9600);    // Initialize serial communications
@@ -93,19 +93,19 @@ void loop() {
     Serial.println("Acceso autorizado");
     Serial.println();
         
-        digitalWrite(D8, HIGH); 
-        digitalWrite(D4, HIGH);       
+        digitalWrite(RelayD8, HIGH); 
+        digitalWrite(LedAzulD4, HIGH);       
         delay(2000);
-        digitalWrite(D4, LOW); 
-        digitalWrite(D8, LOW);
+        digitalWrite(LedAzulD4, LOW); 
+        digitalWrite(RelayD8, LOW);
   }
  
  else   {
     Serial.println(" Acceso negado"); 
     for(int i=0; i<4;i++){
-        digitalWrite(D3, HIGH);       
+        digitalWrite(LedRojoD3, HIGH);       
         delay(100);
-        digitalWrite(D3, LOW); 
+        digitalWrite(LedRojoD3, LOW); 
         delay(100);
     }
   }
