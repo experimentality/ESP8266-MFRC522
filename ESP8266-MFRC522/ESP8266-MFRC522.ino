@@ -22,9 +22,15 @@ GND     = GND
 
 #define LedAzulD4 2
 #define LedRojoD3 0
-#define RelayD8 15
+//#define RelayD8 15
+#define BUTTON 16
+#define BUTTON2 15
 
-
+int ledPin = 13; // LED connected to digital pin 13
+int inPin = 7;   // pushbutton connected to digital pin 7
+int val = 0;     // variable to store the read value
+int boton=0;
+int boton2=0;
 
 const char *ssid =	"yourSSID";	    // change according to your Network - cannot be longer than 32 characters!
 const char *pass =	"yourPASSWORD";	// change according to your Network
@@ -32,10 +38,11 @@ const char *pass =	"yourPASSWORD";	// change according to your Network
 MFRC522 mfrc522(SS_PIN, RST_PIN);	// Create MFRC522 instance
 
 void setup() {
-
+  pinMode(BUTTON, INPUT);      // INPUT BUTTONS
+  pinMode(BUTTON2, INPUT);
   pinMode(LedRojoD3, OUTPUT);
   pinMode(LedAzulD4, OUTPUT);
-  pinMode(RelayD8, OUTPUT);
+  //pinMode(RelayD8, OUTPUT);
 
   
   Serial.begin(9600);    // Initialize serial communications
@@ -63,7 +70,21 @@ void setup() {
 }
 
 void loop() { 
+  boton = digitalRead(BUTTON);   // read the input pin
+  boton2 = digitalRead(BUTTON2);
 
+  if (boton == 1 || boton2 == 1) //Aqui van los UIDs autorizados
+  {
+    Serial.println("Acceso autorizado");
+    Serial.println();
+        
+        //digitalWrite(RelayD8, HIGH); 
+        digitalWrite(LedAzulD4, HIGH);       
+        delay(2000);
+        digitalWrite(LedAzulD4, LOW); 
+        //digitalWrite(RelayD8, LOW);
+  }
+  
   // Busca nuevas tarjetas
   if ( ! mfrc522.PICC_IsNewCardPresent()) 
   {
@@ -88,16 +109,16 @@ void loop() {
   Serial.println();
   Serial.print("Message : ");
   content.toUpperCase();
-  if (content.substring(1) == "36 BA 1B 7E" || content.substring(1) == "63 AF 36 6A" ) //Aqui van los UIDs autorizados
+  if (content.substring(1) == "36 BA 1B 7E" || content.substring(1) == "63 AF 36 6A" || boton == 1) //Aqui van los UIDs autorizados
   {
     Serial.println("Acceso autorizado");
     Serial.println();
         
-        digitalWrite(RelayD8, HIGH); 
+        //digitalWrite(RelayD8, HIGH); 
         digitalWrite(LedAzulD4, HIGH);       
         delay(2000);
         digitalWrite(LedAzulD4, LOW); 
-        digitalWrite(RelayD8, LOW);
+        //digitalWrite(RelayD8, LOW);
   }
  
  else   {
