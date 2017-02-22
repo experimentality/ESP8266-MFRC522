@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /*
 Many thanks to nikxha from the ESP8266 forum
 */
@@ -16,8 +18,8 @@ GND     = GND
 3.3V    = 3.3V
 */
 
-#define RST_PIN	5  // RST-PIN für RC522 - RFID - SPI - Modul D5 
-#define SS_PIN	4  // SDA-PIN für RC522 - RFID - SPI - Modul LedAzulD4 
+#define RST_PIN	5  // RST-PIN fÃ¼r RC522 - RFID - SPI - Modul D5 
+#define SS_PIN	4  // SDA-PIN fÃ¼r RC522 - RFID - SPI - Modul LedAzulD4 
 
 
 #define LedAzulD4 2
@@ -64,6 +66,8 @@ void setup() {
 
 void loop() { 
 
+  digitalWrite(RelayD8, HIGH);
+
   // Busca nuevas tarjetas
   if ( ! mfrc522.PICC_IsNewCardPresent()) 
   {
@@ -88,16 +92,19 @@ void loop() {
   Serial.println();
   Serial.print("Message : ");
   content.toUpperCase();
-  if (content.substring(1) == "36 BA 1B 7E" || content.substring(1) == "63 AF 36 6A" ) //Aqui van los UIDs autorizados
+  if (content.substring(1) == "36 BA 1B 7E" || 
+  content.substring(1) == "63 AF 36 6A" ||
+  content.substring(1) == "3B 75 74 AF" 
+  ) //Aqui van los UIDs autorizados
   {
     Serial.println("Acceso autorizado");
     Serial.println();
         
-        digitalWrite(RelayD8, HIGH); 
+        digitalWrite(RelayD8, LOW); 
         digitalWrite(LedAzulD4, HIGH);       
         delay(2000);
         digitalWrite(LedAzulD4, LOW); 
-        digitalWrite(RelayD8, LOW);
+        digitalWrite(RelayD8, HIGH);
   }
  
  else   {
@@ -110,5 +117,6 @@ void loop() {
     }
   }
 }
+
 
 
